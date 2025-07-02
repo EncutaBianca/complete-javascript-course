@@ -4,24 +4,6 @@
 // const flights =
 //   '_Delayed_Departure;fao93766109;txl2133758440;11:25+_Arrival;bru0943384722;fao93766109;11:45+_Delayed_Arrival;hel7439299980;fao93766109;12:05+_Departure;fao93766109;lis2323639855;12:30';
 
-// const italianFoods = new Set([
-//   'pasta',
-//   'gnocchi',
-//   'tomatoes',
-//   'olive oil',
-//   'garlic',
-//   'basil',
-// ]);
-
-// const mexicanFoods = new Set([
-//   'tortillas',
-//   'beans',
-//   'rice',
-//   'tomatoes',
-//   'avocado',
-//   'garlic',
-// ]);
-
 // // Data needed for first part of the section
 // const restaurant = {
 //   name: 'Classico Italiano',
@@ -136,7 +118,6 @@
 // const [p = 1, q = 1, r = 1] = [8, 9];
 // console.log(p, q, r);
 'use strict';
-
 const weekdays = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 const openingHours = {
   [weekdays[3]]: {
@@ -244,3 +225,221 @@ for (const [key, { open, close }] of entries) {
 //const entries = Object.entries(openingHours);
 //[key,value]
 //for (const [key, { open, close }] of entries) <= here we destructured the object returned by the value property as it was an object.
+
+const orderSet = new Set([
+  'Pasta',
+  'Pizza',
+  'Pizza',
+  'Risotto',
+  'Pasta',
+  'Pizza',
+]);
+
+console.log(orderSet);
+
+console.log(new Set('Jonas'));
+
+console.log(orderSet.size);
+console.log(orderSet.has('Pizza'));
+console.log(orderSet.has('bread'));
+orderSet.add('Garlic Bread');
+orderSet.add('Garlic Bread');
+orderSet.delete('Risotto');
+// orderSet.clear();
+console.log(orderSet);
+
+for (const order of orderSet) console.log(order);
+
+//Example
+const staff = ['Waiter', 'Manager', 'Waiter', 'Waiter', 'Chef'];
+const staffUnique = [...new Set(staff)];
+console.log(staffUnique);
+
+const italianFoods = new Set([
+  'pasta',
+  'gnocchi',
+  'tomatoes',
+  'olive oil',
+  'garlic',
+  'basil',
+]);
+
+const mexicanFoods = new Set([
+  'tortillas',
+  'beans',
+  'rice',
+  'tomatoes',
+  'avocado',
+  'garlic',
+]);
+
+const commonFoods = italianFoods.intersection(mexicanFoods);
+console.log('Intersection:', [...commonFoods]);
+console.log('Intersection:', ...commonFoods);
+
+const italianAndMexican = italianFoods.union(mexicanFoods);
+console.log(italianAndMexican);
+
+console.log(new Set([...italianFoods, ...mexicanFoods]));
+
+const uniqueItalianFoods = italianFoods.difference(mexicanFoods);
+console.log(uniqueItalianFoods);
+
+const rest = new Map();
+rest.set('name', 'Classico Italiano');
+rest.set(1, 'Firenze, Italy');
+rest.set(2, 'Lisbon, Portugal');
+
+rest
+  .set('categories', ['Italian', 'Pizzeria', 'Vegetarian', 'Organic'])
+  .set('open', 11)
+  .set('close', 23)
+  .set(true, 'We are open.')
+  .set(false, 'We are closed.');
+console.log(rest.get('name'));
+console.log(rest.get('categories'));
+
+const time = 12;
+console.log(rest.get(time > rest.get('open') && time < rest.get('close')));
+
+console.log(rest.has('categories'));
+
+const question = new Map([
+  ['question', 'What is the best programming language in the world?'],
+  [1, 'C'],
+  [2, 'Java'],
+  [3, 'Python'],
+  [4, 'JavaScript'],
+  ['correct', 4],
+  [true, 'Correct! 👏'],
+  [false, 'You did not guess the correct answer! 😢'],
+]);
+
+console.log(question);
+//Convert object to map
+console.log(Object.entries(openingHours));
+const hoursMap = new Map(Object.entries(openingHours));
+console.log(hoursMap);
+
+//Quiz app
+console.log(question.get('question'));
+for (const [key, value] of question) {
+  if (typeof key === 'number') {
+    console.log(`Answer - ${key}: ${value}`);
+  }
+}
+
+// const answer = Number(prompt('Your answer'));
+const answer = 3;
+if (answer !== question.get('correct')) {
+  console.log('Try again!');
+} else {
+  console.log('You are so damn right!');
+}
+
+//Convert map to array
+console.log([...question]);
+// console.log(question.entries());
+console.log([...question.keys()]);
+console.log([...question.values()]);
+
+const airline = 'TAP Air Portugal';
+const plane = 'A320';
+
+console.log(plane[0]);
+
+console.log(airline.indexOf('r'));
+console.log(airline.lastIndexOf('r'));
+
+console.log(airline.slice(4));
+console.log(airline.slice(airline.lastIndexOf('r')));
+
+console.log(airline.slice(0, airline.indexOf(' ')));
+console.log(airline.slice(airline.lastIndexOf(' ') + 1));
+
+const seatAssignment = function (seat) {
+  if (seat[seat.length - 1] === 'B' || seat[seat.length - 1] === 'E') {
+    console.log(`Your seat is in the middle.`);
+  } else {
+    console.log(`Your seat is not in the middle. Congrats!`);
+  }
+};
+
+seatAssignment('11B');
+seatAssignment('40E');
+seatAssignment('13A');
+
+//Fixing capitalization in a name:
+
+let passanger = 'bIANcA'; //Bianca
+const fixedPassanger =
+  passanger.slice(0, 1).toUpperCase() + passanger.slice(1).toLowerCase();
+console.log(fixedPassanger);
+
+const fixCapitalization = function (name) {
+  const fixedPassanger =
+    name.slice(0, 1).toUpperCase() + name.slice(1).toLowerCase();
+  return fixedPassanger;
+};
+
+console.log(fixCapitalization('mohAMMAd'));
+
+//Comparing emails
+
+const email = 'hello@bianca.io';
+const loginEmail = 'Hello@ \n Bianca.io';
+
+const cleanedEmail = loginEmail
+  .toLowerCase()
+  .replace('\n', '')
+  .replaceAll(/\s/g, '');
+console.log(cleanedEmail);
+
+const priceGB = '288,97£';
+const priceUS = priceGB.replace('£', '$').replace(',', '.');
+console.log(priceUS);
+
+const announcement =
+  'All passengers come to boarding door 23. Boarding door 23!';
+
+const announcementCorrect = announcement.replaceAll('door', 'gate');
+console.log(announcementCorrect);
+
+//Booleans
+const plane1 = 'Airbus A320neo';
+// console.log(plane1.includes('A320'));
+
+if (plane1.startsWith('Airbus') && plane1.endsWith('neo')) {
+  console.log('Part of the NEW AirBus family.');
+}
+
+const convertToCamelCase = function (...items) {
+  for (const [index, item] of items.entries()) {
+    const [first, second] = item.toLowerCase().trim().split('_');
+
+    const camelCase = first + second[0].toUpperCase() + second.slice(1);
+
+    console.log(camelCase.padEnd(20) + ' ' + '✅'.repeat(index + 1));
+  }
+};
+
+const textArea = document.createElement('textarea');
+document.body.append(textArea);
+
+const button = document.createElement('button');
+button.textContent = 'Press!';
+document.body.append(button);
+
+button.addEventListener('click', function () {
+  const text = textArea.value;
+  const lines = text.split('\n');
+  convertToCamelCase(...lines);
+});
+// console.log(
+//   convertToCamelCase(
+//     'bianca_encuta',
+//     'pedro_Pascal',
+//     'calculate_AGE',
+//     'SOme_Variable'
+//   )
+// );
