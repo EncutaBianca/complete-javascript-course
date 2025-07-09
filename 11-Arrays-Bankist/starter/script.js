@@ -70,7 +70,7 @@ const displayMovements = function (movements) {
           <div class="movements__type movements__type--${type}">${
       i + 1
     } ${type}</div>
-          <div class="movements__value">${Math.abs(mov)}</div>
+          <div class="movements__value">${Math.abs(mov)}€</div>
       </div>
     `;
     containerMovements.insertAdjacentHTML('afterbegin', html);
@@ -79,6 +79,114 @@ const displayMovements = function (movements) {
 
 displayMovements(account1.movements);
 
+function createUsername(accounts) {
+  accounts.forEach(function (account) {
+    console.log(
+      (account.username = account.owner
+        .toLowerCase()
+        .split(' ')
+        .map(user => user[0])
+        .join(''))
+    );
+  });
+}
+createUsername(accounts);
+
+const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+const deposits = movements.filter(function (mov) {
+  return mov > 0;
+});
+const withdrawals = movements.filter(mov => mov < 0);
+console.log(movements);
+console.log(deposits);
+console.log(withdrawals);
+
+const calcDisplayBalance = function (movements) {
+  const balance = movements.reduce(function (acc, mov) {
+    return acc + mov;
+  }, 0);
+  labelBalance.textContent = '';
+  labelBalance.textContent = `${balance} €`;
+};
+
+calcDisplayBalance(account1.movements);
+
+const calcDisplaySummary = function (movements) {
+  const incomes = movements
+    .filter(mov => mov > 0)
+    .reduce((sum, curr) => (sum += curr), 0);
+  const outcomes = movements
+    .filter(mov => mov < 0)
+    .reduce((sum, curr) => (sum += curr), 0);
+
+  const interest = movements
+    .filter(mov => mov > 0)
+    .map(deposit => (deposit * 1.2) / 100)
+    .filter((int, i, arr) => int >= 1)
+    .reduce((sum, int) => (sum += int), 0);
+  labelSumIn.textContent = '';
+  labelSumIn.textContent = `${incomes}€`;
+  labelSumOut.textContent = '';
+  labelSumOut.textContent = `${Math.abs(outcomes)}€`;
+  labelSumInterest.textContent = '';
+  labelSumInterest.textContent = `${interest}€`;
+};
+calcDisplaySummary(account1.movements);
+
+//Maximum value;
+// let maxVal = Math.max(...movements);
+// console.log(maxVal);
+
+//Maximum value using reduce method
+// const max = movements.reduce(
+//   (acc, num) => (num > acc ? num : acc),
+//   movements[0]
+// );
+// console.log(max);
+
+const eurToUsd = 1.1;
+const totalDepositsUSD = movements
+  .filter(mov => mov > 0)
+  .map(mov => mov * eurToUsd)
+  .reduce((acc, mov) => acc + mov, 0);
+
+console.log(totalDepositsUSD);
+// Three of the most important array methods: MAP, FILTER, REDUCE!
+// MAP() => Maps the values of the original array to a new array using a callback function that takes each current element and does what the callback function says.
+
+//FILTER() => Returns a new array containing the array elements that passed a specified test condition.
+
+//REDUCE() => Boils all array elements down to one single value (adding all elements together)
+
+// const arr = [1, 2, 3];
+// const arr1 = arr.reduce(function (acc, cur) {
+//   return acc + cur;
+// });
+
+// console.log(arr1);
+
+// const eurToUsd = 1.1;
+// const movementsToUsd = account1.movements.map(mov =>
+//   Math.round(Math.abs(mov) * eurToUsd)
+// );
+// console.log(account1.movements);
+// console.log(movementsToUsd);
+
+// const movDesc = account2.movements.map((mov, i, arr) => {
+//   return `Movement ${i + 1}: You ${
+//     mov < 0 ? 'withdrew' : 'deposited'
+//   } ${Math.abs(mov)}`;
+// });
+// console.log(movDesc);
+// movDesc.forEach(mov => console.log(mov));
+
+// const user = 'Daniela Mihaela Cristescu';
+
+// const arr2 = [];
+// for (const mov of account1.movements) {
+//   arr2.push(Math.round(Math.abs(mov) * eurToUsd));
+// }
+// console.log(arr2);
 /* 
 Julia and Kate are doing a study on dogs. So each of them asked 5 dog owners about their dog's age, and stored the data into an array (one array for each). For now, they are just interested in knowing whether a dog is an adult or a puppy. A dog is an adult if it is at least 3 years old, and it's a puppy if it's less than 3 years old.
 
@@ -106,8 +214,6 @@ GOOD LUCK 😀
 //   ['EUR', 'Euro'],
 //   ['GBP', 'Pound sterling'],
 // ]);
-
-// const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 /////////////////////////////////////////////////
 
@@ -224,3 +330,46 @@ GOOD LUCK 😀
 
 // checkDogs([3, 5, 2, 12, 7], [4, 1, 15, 8, 3]);
 // checkDogs([9, 16, 6, 8, 3], [10, 5, 6, 1, 4]);
+
+///////////////////////////////////////
+// Coding Challenge #2
+
+/* 
+Let's go back to Julia and Kate's study about dogs. This time, they want to convert dog ages to human ages and calculate the average age of the dogs in their study.
+
+Create a function 'calcAverageHumanAge', which accepts an arrays of dog's ages ('ages'), and does the following things in order:
+
+1. Calculate the dog age in human years using the following formula: if the dog is <= 2 years old, humanAge = 2 * dogAge. If the dog is > 2 years old, humanAge = 16 + dogAge * 4.
+2. Exclude all dogs that are less than 18 human years old (which is the same as keeping dogs that are at least 18 years old)
+3. Calculate the average human age of all adult dogs (you should already know from other challenges how we calculate averages 😉)
+4. Run the function for both test datasets
+
+TEST DATA 1: [5, 2, 4, 1, 15, 8, 3]
+TEST DATA 2: [16, 6, 10, 5, 6, 1, 4]
+
+GOOD LUCK 😀
+*/
+
+const calcAverageHumanAge = arr => {
+  const humanAge = arr
+    .map(dog => (dog <= 2 ? dog * 2 : 16 + dog * 4))
+    .filter(dog => dog > 18);
+
+  const avg = humanAge.reduce((sum, age) => (sum += age), 0) / humanAge.length;
+  return avg;
+};
+
+console.log(calcAverageHumanAge([5, 2, 4, 1, 15, 8, 3]));
+console.log(calcAverageHumanAge([16, 6, 10, 5, 6, 1, 4]));
+
+///////////////////////////////////////
+// Coding Challenge #3
+
+/* 
+Rewrite the 'calcAverageHumanAge' function from the previous challenge, but this time as an arrow function, and using chaining!
+
+TEST DATA 1: [5, 2, 4, 1, 15, 8, 3]
+TEST DATA 2: [16, 6, 10, 5, 6, 1, 4]
+
+GOOD LUCK 😀
+*/
