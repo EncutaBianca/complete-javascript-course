@@ -10,6 +10,7 @@ const account1 = {
   movements: [200, 450, -400, 3000, -650, -130, 70, 1300],
   interestRate: 1.2, // %
   pin: 1111,
+  type: 'premium',
 };
 
 const account2 = {
@@ -17,6 +18,7 @@ const account2 = {
   movements: [5000, 3400, -150, -790, -3210, -1000, 8500, -30],
   interestRate: 1.5,
   pin: 2222,
+  type: 'standard',
 };
 
 const account3 = {
@@ -24,6 +26,7 @@ const account3 = {
   movements: [200, -200, 340, -300, -20, 50, 400, -460],
   interestRate: 0.7,
   pin: 3333,
+  type: 'premium',
 };
 
 const account4 = {
@@ -31,6 +34,7 @@ const account4 = {
   movements: [430, 1000, 700, 50, 90],
   interestRate: 1,
   pin: 4444,
+  type: 'basic',
 };
 
 const accounts = [account1, account2, account3, account4];
@@ -61,9 +65,12 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
-const displayMovements = function (acc) {
+// const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+const displayMovements = function (movements, sort = false) {
   containerMovements.innerHTML = '';
-  acc.movements.forEach(function (mov, i) {
+
+  const movs = sort ? movements.slice().sort((a, b) => a - b) : movements;
+  movs.forEach(function (mov, i) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
     const html = `
      <div class="movements__row">
@@ -77,7 +84,7 @@ const displayMovements = function (acc) {
   });
 };
 
-displayMovements(account1);
+// displayMovements();
 
 function createUsername(accounts) {
   accounts.forEach(function (account) {
@@ -94,7 +101,7 @@ createUsername(accounts);
 
 const updateUI = function (acc) {
   //Display movements
-  displayMovements(currentAccount);
+  displayMovements(currentAccount.movements);
 
   //Display balance
   calcDisplayBalance(currentAccount);
@@ -195,6 +202,18 @@ btnTransfer.addEventListener('click', function (e) {
   }
 });
 
+btnLoan.addEventListener('click', function (e) {
+  e.preventDefault();
+
+  const amount = Number(inputLoanAmount.value);
+
+  if (amount > 0 && currentAccount.movements.some(mov => mov >= amount / 10)) {
+    currentAccount.movements.push(amount);
+    updateUI(currentAccount);
+  }
+  inputLoanAmount.value = '';
+});
+
 btnClose.addEventListener('click', function (e) {
   e.preventDefault();
 
@@ -216,33 +235,129 @@ btnClose.addEventListener('click', function (e) {
   inputClosePin.blur();
 });
 
-// Find method retrieves the first element in the array that satisfies the condition
-const firstWitdrawal = movements.find(mov => mov < 0);
-console.log(movements);
-console.log(firstWitdrawal);
+let sorted = false;
 
-console.log(accounts);
+btnSort.addEventListener('click', function (e) {
+  e.preventDefault();
+
+  displayMovements(currentAccount.movements, !sorted);
+
+  sorted = !sorted;
+});
+
+//EQUALITY
+console.log(movements.includes(-130));
+
+//SOME: CONDITION
+console.log(movements.some(mov => mov === -130));
+const anyDeposits = movements.some(mov => mov > 5000);
+console.log(anyDeposits);
+//EVERY
+console.log(movements.every(mov => mov > 0));
+console.log(account4.movements.every(mov => mov > 0));
+
+//Separate callback
+const deposit = mov => mov > 0;
+console.log(movements.some(deposit));
+console.log(movements.every(deposit));
+console.log(movements.filter(deposit));
+
+const arr = [[1, 2, 3], [4, 5, 6], 7, 8];
+const arr1 = [...[1, 2, 3], ...[4, 5, 6], 7, 8];
+console.log(arr1);
+console.log(arr.flat());
+
+//By specifying 2 as an argument to the flat() method we specify how deep in the nesting we want to go.
+const arrDeep = [[[1, 2], 3], [4, [5, 6]], 7, 8];
+console.log(arrDeep.flat(2));
+
+const accountMovements = accounts
+  .map(acc => acc.movements)
+  .flat()
+  .reduce((sum, mov, i, arr) => {
+    return (sum += mov);
+  }, 0);
+console.log(accountMovements);
+
+const accountMovements1 = accounts
+  .flatMap(acc => acc.movements)
+  .reduce((sum, mov, i, arr) => {
+    return (sum += mov);
+  }, 0);
+console.log(accountMovements1);
+
+// return < 0, A, B (keep order)
+// return > 0, B, A (switch order)
+console.log(`Here you have your unordered list: ${movements}`);
+//Ascending
+// movements.sort((a, b) => {
+//   if (a > b) return 1; //switch order;
+//   if (a < b) return -1; //keep order;
+// });
+movements.sort((a, b) => a - b);
+console.log(`Here you have your ascending order list: ${movements}`);
+
+//Descending
+// movements.sort((a, b) => {
+//   if (a < b) return 1; //switch order;
+//   if (a > b) return -1; //keep order;
+// });
+movements.sort((a, b) => b - a);
+console.log(`Here you have your descending order list: ${movements}`);
+
+//Object.groupBy(theArrayWeWorkWith, callbackFunction that tells the rule by which we group the elements)
+const groupedMovements = Object.groupBy(movements, movement =>
+  movement > 0 ? 'deposits' : 'withdrawals'
+);
+console.log(groupedMovements);
+const groupByActivity = Object.groupBy(accounts, account => {
+  const movementCount = account.movements.length;
+  if (movementCount >= 8) return 'very active';
+  if (movementCount >= 4) return 'active';
+  if (movementCount >= 1) return 'moderate';
+  if (movementCount === 0) return 'inactive';
+});
+console.log(groupByActivity);
+
+const groupByType = Object.groupBy(accounts, account => {
+  if (account.type === 'premium') return 'premium';
+  if (account.type === 'basic') return 'basic';
+  if (account.type === 'standard') return 'standard';
+});
+console.log(groupByType);
+const arr3 = new Array(4).fill(0);
+console.log(arr3);
+const diceRollArr = Array.from({ length: 100 }, (_, i) => {
+  return `Roll ${i + 1}: ${Math.floor(Math.random() * 100) + 1}`;
+});
+console.log(diceRollArr, diceRollArr.includes(100));
+// // Find method retrieves the first element in the array that satisfies the condition
+// const firstWitdrawal = movements.find(mov => mov < 0);
+// console.log(movements);
+// console.log(firstWitdrawal);
+
+// console.log(accounts);
 // const account = accounts.find(acc => acc.owner === 'Jessica Davis');
 // console.log(account);
 
-for (const acc of accounts) {
-  if (acc.owner === 'Jessica Davis') {
-    console.log(acc);
-  }
-}
+// for (const acc of accounts) {
+//   if (acc.owner === 'Jessica Davis') {
+//     console.log(acc);
+//   }
+// }
 
-const bigMov = movements.reduce((sum, mov, i, arr) => {
-  return sum < mov ? mov : sum;
-}, movements[0]);
-console.log(bigMov);
-const lastBigMov = movements.findLastIndex(mov => Math.abs(mov) > 1000);
-console.log(movements);
-console.log(lastBigMov);
-console.log(
-  `Your latest large movement was ${
-    movements.length - lastBigMov
-  } movements ago.`
-);
+// const bigMov = movements.reduce((sum, mov, i, arr) => {
+//   return sum < mov ? mov : sum;
+// }, movements[0]);
+// console.log(bigMov);
+// const lastBigMov = movements.findLastIndex(mov => Math.abs(mov) > 1000);
+// console.log(movements);
+// console.log(lastBigMov);
+// console.log(
+//   `Your latest large movement was ${
+//     movements.length - lastBigMov
+//   } movements ago.`
+// );
 //Maximum value;
 // let maxVal = Math.max(...movements);
 // console.log(maxVal);
@@ -483,3 +598,132 @@ TEST DATA 2: [16, 6, 10, 5, 6, 1, 4]
 
 GOOD LUCK 😀
 */
+
+///////////////////////////////////////
+// Coding Challenge #4
+
+/*
+This time, Julia and Kate are studying the activity levels of different dog breeds.
+
+YOUR TASKS:
+1. Store the the average weight of a "Husky" in a variable "huskyWeight"
+2. Find the name of the only breed that likes both "running" and "fetch" ("dogBothActivities" variable)
+3. Create an array "allActivities" of all the activities of all the dog breeds
+4. Create an array "uniqueActivities" that contains only the unique activities (no activity repetitions). HINT: Use a technique with a special data structure that we studied a few sections ago.
+5. Many dog breeds like to swim. What other activities do these dogs like? Store all the OTHER activities these breeds like to do, in a unique array called "swimmingAdjacent".
+6. Do all the breeds have an average weight of 10kg or more? Log to the console whether "true" or "false".
+7. Are there any breeds that are "active"? "Active" means that the dog has 3 or more activities. Log to the console whether "true" or "false".
+
+BONUS: What's the average weight of the heaviest breed that likes to fetch? HINT: Use the "Math.max" method along with the ... operator.
+
+TEST DATA:
+*/
+
+// const breeds = [
+//   {
+//     breed: 'German Shepherd',
+//     averageWeight: 32,
+//     activities: ['fetch', 'swimming'],
+//   },
+//   {
+//     breed: 'Dalmatian',
+//     averageWeight: 24,
+//     activities: ['running', 'fetch', 'agility'],
+//   },
+//   {
+//     breed: 'Labrador',
+//     averageWeight: 28,
+//     activities: ['swimming', 'fetch'],
+//   },
+//   {
+//     breed: 'Beagle',
+//     averageWeight: 12,
+//     activities: ['digging', 'fetch'],
+//   },
+//   {
+//     breed: 'Husky',
+//     averageWeight: 26,
+//     activities: ['running', 'agility', 'swimming'],
+//   },
+//   {
+//     breed: 'Bulldog',
+//     averageWeight: 36,
+//     activities: ['sleeping'],
+//   },
+//   {
+//     breed: 'Poodle',
+//     averageWeight: 18,
+//     activities: ['agility', 'fetch'],
+//   },
+// ];
+// const huskyWeight = breeds.find(breed => breed.breed === 'Husky').averageWeight;
+// console.log(huskyWeight);
+// const dogBothActivities = breeds.find(
+//   breed =>
+//     breed.activities.includes('fetch') && breed.activities.includes('running')
+// ).breed;
+// console.log(dogBothActivities);
+// const allActivities = breeds.flatMap(breed => breed.activities);
+// console.log(allActivities);
+// const uniqueActivities = [...new Set(allActivities)];
+// console.log(uniqueActivities);
+// const swimmingAdjacent = breeds
+//   .filter(breed => breed.activities.includes('swimming'))
+//   .flatMap(breed => breed.activities)
+//   .filter(activity => activity !== 'swimming');
+// console.log([...new Set(swimmingAdjacent)]);
+// console.log(breeds.every(breed => breed.averageWeight >= 10));
+// console.log(breeds.some(breed => breed.activities.length >= 3));
+
+//1.
+// const bankDepositsSum = accounts
+//   .flatMap(acc => acc.movements)
+//   .filter(mov => mov > 0)
+//   .reduce((sum, mov) => (sum += mov));
+// console.log(bankDepositsSum);
+
+//2.
+// const numDeposits1000 = accounts
+//   .flatMap(acc => acc.movements)
+//   .filter(mov => mov >= 1000);
+// console.log(numDeposits1000, numDeposits1000.length);
+
+// ///////////////////////////////////////
+// Coding Challenge #5
+
+/* 
+Julia and Kate are still studying dogs. This time they are want to figure out if the dogs in their are eating too much or too little food.
+
+- Formula for calculating recommended food portion: recommendedFood = weight ** 0.75 * 28. (The result is in grams of food, and the weight needs to be in kg)
+- Eating too much means the dog's current food portion is larger than the recommended portion, and eating too little is the opposite.
+- Eating an okay amount means the dog's current food portion is within a range 10% above and below the recommended portion (see hint).
+
+YOUR TASKS:
+1. Loop over the array containing dog objects, and for each dog, calculate the recommended food portion (recFood) and add it to the object as a new property. Do NOT create a new array, simply loop over the array (We never did this before, so think about how you can do this without creating a new array).
+2. Find Sarah's dog and log to the console whether it's eating too much or too little. HINT: Some dogs have multiple users, so you first need to find Sarah in the owners array, and so this one is a bit tricky (on purpose) 🤓
+3. Create an array containing all owners of dogs who eat too much (ownersTooMuch) and an array with all owners of dogs who eat too little (ownersTooLittle).
+4. Log a string to the console for each array created in 3., like this: "Matilda and Alice and Bob's dogs eat too much!" and "Sarah and John and Michael's dogs eat too little!"
+5. Log to the console whether there is ANY dog eating EXACTLY the amount of food that is recommended (just true or false)
+6. Log to the console whether ALL of the dogs are eating an OKAY amount of food (just true or false)
+7. Create an array containing the dogs that are eating an OKAY amount of food (try to reuse the condition used in 6.)
+8. Group the dogs into the following 3 groups: 'exact', 'too-much' and 'too-little', based on whether they are eating too much, too little or the exact amount of food, based on the recommended food portion.
+9. Group the dogs by the number of owners they have
+10. Sort the dogs array by recommended food portion in an ascending order. Make sure to NOT mutate the original array!
+
+HINT 1: Use many different tools to solve these challenges, you can use the summary lecture to choose between them 😉
+HINT 2: Being within a range 10% above and below the recommended portion means: current > (recommended * 0.90) && current < (recommended * 1.10). Basically, the current portion should be between 90% and 110% of the recommended portion.
+
+TEST DATA:
+*/
+const dogs = [
+  { weight: 22, curFood: 250, owners: ['Alice', 'Bob'] },
+  { weight: 8, curFood: 200, owners: ['Matilda'] },
+  { weight: 13, curFood: 275, owners: ['Sarah', 'John', 'Leo'] },
+  { weight: 18, curFood: 244, owners: ['Joe'] },
+  { weight: 32, curFood: 340, owners: ['Michael'] },
+];
+
+dogs.forEach(dog => {
+  const recFood = dog.weight ** 0.75 * 28;
+  dog.recFood = Math.floor(recFood);
+});
