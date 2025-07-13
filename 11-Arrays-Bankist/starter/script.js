@@ -727,3 +727,52 @@ dogs.forEach(dog => {
   const recFood = dog.weight ** 0.75 * 28;
   dog.recFood = Math.floor(recFood);
 });
+console.log(dogs);
+
+const sarahDog = dogs.find(dog => dog.owners.includes('Sarah'));
+console.log(
+  `Sarah's dog eats too ${
+    sarahDog.curFood > sarahDog.recFood ? 'much.' : 'little.'
+  }`
+);
+
+const ownersTooMuch = dogs
+  .filter(dog => dog.recFood < dog.curFood)
+  .flatMap(dog => dog.owners);
+const ownersTooLittle = dogs
+  .filter(dog => dog.recFood > dog.curFood)
+  .flatMap(dog => dog.owners);
+
+console.log(ownersTooMuch);
+console.log(ownersTooLittle);
+
+console.log(`${ownersTooLittle.join(' and ')}'s dogs eat too little.`);
+console.log(`${ownersTooMuch.join(' and ')}'s dogs eat too much.`);
+
+console.log(dogs.some(dog => dog.curFood === dog.recFood));
+
+const checkEatingOK = dog =>
+  dog.curFood < dog.recFood * 1.1 && dog.curFood > dog.recFood * 0.9;
+console.log(dogs.every(checkEatingOK));
+
+const dogsEatingOK = dogs.filter(checkEatingOK);
+console.log(dogsEatingOK);
+
+const dogsGroupedByPortion = Object.groupBy(dogs, dog => {
+  if (dog.curFood > dog.recFood) {
+    return 'too much';
+  } else if (dog.curFood < dog.recFood) {
+    return 'too little';
+  } else {
+    return 'exact';
+  }
+});
+console.log(dogsGroupedByPortion);
+
+const dogsGroupedByOwners = Object.groupBy(
+  dogs,
+  dog => `${dog.owners.length} ${dog.owners.length === 1 ? 'owner' : 'owners'} `
+);
+console.log(dogsGroupedByOwners);
+
+console.log(dogs.slice().sort((a, b) => a.recFood - b.recFood));
